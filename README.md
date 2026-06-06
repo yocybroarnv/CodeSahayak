@@ -16,7 +16,7 @@
 ## Features
 
 - **AI-Powered Learning**: Get instant help from Gurujii, your AI coding tutor
-- **Multi-Language Support**: Learn in 9 Indian languages
+- **Multi-Language Support**: Learn in 22 Indian languages
 - **Interactive IDE**: Write, run, and debug code in real-time
 - **Real-Time Error Detection**: Understand errors with clear explanations
 - **Voice Explanations**: Listen to error explanations in your language
