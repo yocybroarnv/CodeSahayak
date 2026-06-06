@@ -1,0 +1,215 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String
+  name          String
+  role          UserRole  @default(STUDENT)
+  language      String    @default("en")
+  avatar        String?
+  isVerified    Boolean   @default(false)
+  isPro         Boolean   @default(false)
+  proExpiresAt  DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Student fields
+  streak        Int       @default(0)
+  lastActive    DateTime?
+  xp            Int       @default(0)
+  level         Int       @default(1)
+  
+  // Teacher fields
+  institution   String?
+  department    String?
+  
+  // Relations
+  progress      Progress[]
+  assignments   Assignment[]
+  submissions   Submission[]
+  payments      Payment[]
+  offlineCache  OfflineCache[]
+  
+  @@map("users")
+}
+
+model Progress {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  concept         String
+  language        String
+  masteryLevel    Int      @default(0) // 0-100
+  attempts        Int      @default(0)
+  correctAttempts Int      @default(0)
+  lastAttemptAt   DateTime?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@unique([userId, concept, language])
+  @@map("progress")
+}
+
+model Assignment {
+  id          String   @id @default(cuid())
+  teacherId   String
+  teacher     User     @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  
+  title       String
+  description String
+  syllabus    String   // NCERT, VTU, etc.
+  subject     String
+  difficulty  Difficulty @default(MEDIUM)
+  dueDate     DateTime?
+  
+  // Code template
+  starterCode String?
+  testCases   String?  // JSON array
+  
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  submissions Submission[]
+  
+  @@map("assignments")
+}
+
+model Submission {
+  id            String   @id @default(cuid())
+  assignmentId  String
+  assignment    Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  studentId     String
+  student       User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  
+  code          String
+  language      String   // programming language
+  status        SubmissionStatus @default(PENDING)
+  score         Int?
+  feedback      String?
+  hintsUsed     Int      @default(0)
+  timeSpent     Int      // in seconds
+  
+  // Plagiarism & Originality analysis fields
+  originalityScore Int?
+  isRenameOnly     Boolean?
+  isInstantPaste   Boolean?
+  maxSimilarity    Float?
+  
+  submittedAt   DateTime @default(now())
+  reviewedAt    DateTime?
+  
+  @@map("submissions")
+}
+
+model Payment {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  razorpayOrderId   String   @unique
+  razorpayPaymentId String?
+  razorpaySignature String?
+  
+  amount      Int      // in paise
+  currency    String   @default("INR")
+  plan        PlanType
+  status      PaymentStatus @default(PENDING)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("payments")
+}
+
+model OfflineCache {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  contentType String   // problem, explanation, assignment
+  contentId   String
+  content     String   // JSON stringified content
+  language    String
+  
+  downloadedAt DateTime @default(now())
+  expiresAt   DateTime?
+  
+  @@unique([userId, contentType, contentId, language])
+  @@map("offline_cache")
+}
+
+model Syllabus {
+  id          String   @id @default(cuid())
+  code        String   @unique // NCERT-CS-11, VTU-CSE-3, etc.
+  name        String
+  board       String   // NCERT, CBSE, VTU, Anna, etc.
+  grade       String?  // 11, 12, UG-1, etc.
+  subject     String   // Computer Science, etc.
+  
+  topics      Topic[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("syllabus")
+}
+
+model Topic {
+  id          String   @id @default(cuid())
+  syllabusId  String
+  syllabus    Syllabus @relation(fields: [syllabusId], references: [id], onDelete: Cascade)
+  
+  name        String
+  order       Int
+  concepts    String[] // Array of concept names
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("topics")
+}
+
+enum UserRole {
+  STUDENT
+  TEACHER
+  ADMIN
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum SubmissionStatus {
+  PENDING
+  SUBMITTED
+  REVIEWED
+  PASSED
+  FAILED
+}
+
+enum PlanType {
+  STUDENT_FREE
+  STUDENT_PRO_MONTHLY
+  STUDENT_PRO_YEARLY
+  INSTITUTION
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}

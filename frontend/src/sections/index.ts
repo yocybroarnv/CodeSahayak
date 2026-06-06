@@ -1,0 +1,14 @@
+export { HeroSection } from './HeroSection';
+export { ImpactSection } from './ImpactSection';
+export { FeaturesSection } from './FeaturesSection';
+export { StudentsSection } from './StudentsSection';
+export { TeachersSection } from './TeachersSection';
+export { EditorSection } from './EditorSection';
+export { DebugModalSection } from './DebugModalSection';
+export { ProgressSection } from './ProgressSection';
+export { TestimonialsSection } from './TestimonialsSection';
+export { PricingSection } from './PricingSection';
+export { OnboardingSection } from './OnboardingSection';
+export { WhatsAppSection } from './WhatsAppSection';
+export { FAQSection } from './FAQSection';
+export { Footer } from './Footer';
