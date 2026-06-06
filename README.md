@@ -73,21 +73,30 @@ start-all.bat
 
 5. Access at http://localhost:5173
 
-## Technology Stack
+## Technology Stack & Architecture
 
-### Frontend
-- React 19.2, TypeScript, Vite
-- Tailwind CSS, Monaco Editor
-- Framer Motion, Zustand
+### AI Engine & Natural Language Processing (NLP)
+- **Hugging Face Transformers**: Integrates LLMs (TinyLlama-1.1B) for code analysis, error explanation generation, and interactive hints.
+- **Meta NLLB-200 (No Language Left Behind)**: Utilizes sequence-to-sequence translation models (distilled 600M) for high-fidelity translation of educational content into 22 Indian regional languages.
+- **Meta MMS-TTS & gTTS**: Powers the voice engine, synthesizing regional text-to-speech (TTS) audio explanations for students.
+- **Langdetect & NLP Gatekeepers**: Automatic language classification of query intent (concept check vs. copying check) to ensure ethical learning.
+- **PyTorch (Audio/Core)**: Serves as the deep learning backend for tokenizing and generating model outputs locally.
 
-### Backend
-- Node.js, Express, Prisma
-- PostgreSQL, JWT, TypeScript
+### Frontend (Interactive IDE & Client)
+- **React 19.2, TypeScript, Vite**: High-performance modern UI rendering with strong type safety and hot-reloading.
+- **Pyodide (WebAssembly)**: Runs a complete Python execution environment directly in the browser, enabling secure, real-time code runs without server-side compute overhead.
+- **Monaco Editor (VS Code Kernel)**: Implements auto-completions, syntax highlighting, and inline diagnostic markers.
+- **GSAP (GreenSock) & Framer Motion**: Custom micro-animations and physics-based scroll triggers for premium user experience.
+- **Zustand**: Lightweight, reactive state management across editor layouts and local user configuration.
+- **Tailwind CSS & Shadcn/ui**: Modern design system utilizing elegant color spaces and fluid typography.
 
-### AI Engine
-- Python Flask, PyTorch
-- Transformers, TinyLlama
-- NLLB-200, MMS-TTS
+### Backend (Business Logic & Middleware)
+- **Node.js, Express, TypeScript**: Secure routing and controllers.
+- **Prisma ORM**: Data access layer mapping clean database operations.
+- **PostgreSQL**: Relational database for storing student progress, syllabus boards, program settings, and enrollment.
+- **Redis**: High-speed memory store for session blacklists (JWT revokes) and rate-limit tracking.
+- **Razorpay SDK**: Handles billing, subscriptions, and payment callbacks.
+- **Helmet, Cors, CSRF Protection**: Multi-layered API security preventing injection, cross-origin scripting, and forged request vulnerabilities.
 
 ## Documentation
 
